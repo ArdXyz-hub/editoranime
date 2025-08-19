@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Sticker - Tools Ardan</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            color: #25D366;
+        }
+        
+        .subtitle {
+            color: #a0a0a0;
+            margin-bottom: 20px;
+        }
+        
+        .editor-container {
+            background-color: #1e1e1e;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+        
+        .sticker-preview {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 30px;
+            background-color: #2d2d2d;
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        #stickerCanvas {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+        }
+        
+        .upload-area {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            padding: 20px;
+            border: 2px dashed #444;
+            border-radius: 10px;
+            transition: border-color 0.3s;
+        }
+        
+        .upload-area:hover {
+            border-color: #25D366;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #25D366;
+        }
+        
+        .upload-text {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .upload-subtext {
+            color: #a0a0a0;
+            font-size: 0.9rem;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #e0e0e0;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #25D366;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #25D366;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: #2d2d2d;
+            color: white;
+            border: 1px solid #444;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #333;
+        }
+        
+        .notification {
+            background-color: #333;
+            border-left: 4px solid #25D366;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification-icon {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            color: #25D366;
+        }
+        
+        .notification-text {
+            flex: 1;
+        }
+        
+        .notification-link {
+            color: #25D366;
+            font-weight: 600;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+        
+        .notification-link:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #a0a0a0;
+            font-size: 0.9rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            .sticker-preview {
+                width: 250px;
+                height: 250px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>WhatsApp Sticker Creator</h1>
+            <p class="subtitle">Buat stiker whatsapp dengan text custom</p>
+        </header>
+        
+        <div class="notification">
+            <div class="notification-icon">⚠️</div>
+            <div class="notification-text">
+                <strong>Penting!</strong> Gunakan bot LunaAsistent untuk mengubah gambar menjadi stiker WhatsApp. 
+                <a href="https://wa.me/628983692907" class="notification-link" target="_blank">Klik disini</a> untuk membuka chat bot.
+            </div>
+        </div>
+        
+        <div class="editor-container">
+            <div class="sticker-preview">
+                <canvas id="stickerCanvas"></canvas>
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">🖼️</div>
+                    <div class="upload-text">Upload Gambar</div>
+                    <div class="upload-subtext">Seret & lepas atau klik untuk memilih</div>
+                    <input type="file" id="fileInput" accept="image/*">
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label for="topText">Text Atas</label>
+                <input type="text" id="topText" placeholder="Masukkan teks atas...">
+            </div>
+            
+            <div class="input-group">
+                <label for="bottomText">Text Bawah</label>
+                <input type="text" id="bottomText" placeholder="Masukkan teks bawah...">
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-secondary" id="resetBtn">Reset</button>
+                <button class="btn btn-primary" id="downloadBtn">Download Stiker</button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© Made by Ardan</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('stickerCanvas');
+            const ctx = canvas.getContext('2d');
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const topTextInput = document.getElementById('topText');
+            const bottomTextInput = document.getElementById('bottomText');
+            const resetBtn = document.getElementById('resetBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            let originalImage = null;
+            let imageUrl = null;
+            
+            // Set canvas size
+            canvas.width = 512;
+            canvas.height = 512;
+            
+            // Upload area click handler
+            uploadArea.addEventListener('click', () => fileInput.click());
+            
+            // File input change handler
+            fileInput.addEventListener('change', handleImageUpload);
+            
+            // Drag and drop handlers
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#25D366';
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.borderColor = '#444';
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.borderColor = '#444';
+                
+                if (e.dataTransfer.files.length) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleImageUpload();
+                }
+            });
+            
+            // Text input handlers
+            topTextInput.addEventListener('input', drawSticker);
+            bottomTextInput.addEventListener('input', drawSticker);
+            
+            // Reset button handler
+            resetBtn.addEventListener('click', resetEditor);
+            
+            // Download button handler
+            downloadBtn.addEventListener('click', downloadSticker);
+            
+            // Handle image upload
+            function handleImageUpload() {
+                const file = fileInput.files[0];
+                if (!file) return;
+                
+                if (imageUrl) {
+                    URL.revokeObjectURL(imageUrl);
+                }
+                
+                imageUrl = URL.createObjectURL(file);
+                
+                const img = new Image();
+                img.onload = function() {
+                    originalImage = img;
+                    drawSticker();
+                    
+                    // Show canvas and hide upload area
+                    canvas.style.display = 'block';
+                    uploadArea.style.display = 'none';
+                };
+                img.src = imageUrl;
+            }
+            
+            // Draw sticker with text
+            function drawSticker() {
+                if (!originalImage) return;
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Calculate aspect ratio
+                const imgAspect = originalImage.width / originalImage.height;
+                const canvasAspect = canvas.width / canvas.height;
+                
+                let drawWidth, drawHeight, offsetX, offsetY;
+                
+                if (imgAspect > canvasAspect) {
+                    // Image is wider than canvas
+                    drawWidth = canvas.width;
+                    drawHeight = canvas.width / imgAspect;
+                    offsetX = 0;
+                    offsetY = (canvas.height - drawHeight) / 2;
+                } else {
+                    // Image is taller than canvas
+                    drawHeight = canvas.height;
+                    drawWidth = canvas.height * imgAspect;
+                    offsetX = (canvas.width - drawWidth) / 2;
+                    offsetY = 0;
+                }
+                
+                // Draw image
+                ctx.drawImage(originalImage, offsetX, offsetY, drawWidth, drawHeight);
+                
+                // Add text
+                const topText = topTextInput.value;
+                const bottomText = bottomTextInput.value;
+                
+                // Style for text
+                ctx.fillStyle = 'white';
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 8;
+                ctx.textAlign = 'center';
+                ctx.font = 'bold 48px Poppins, sans-serif';
+                
+                // Draw top text
+                if (topText) {
+                    ctx.strokeText(topText, canvas.width / 2, 70);
+                    ctx.fillText(topText, canvas.width / 2, 70);
+                }
+                
+                // Draw bottom text
+                if (bottomText) {
+                    ctx.strokeText(bottomText, canvas.width / 2, canvas.height - 30);
+                    ctx.fillText(bottomText, canvas.width / 2, canvas.height - 30);
+                }
+            }
+            
+            // Reset editor
+            function resetEditor() {
+                topTextInput.value = '';
+                bottomTextInput.value = '';
+                
+                if (originalImage) {
+                    drawSticker();
+                } else {
+                    canvas.style.display = 'none';
+                    uploadArea.style.display = 'flex';
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            
+            // Download sticker
+            function downloadSticker() {
+                if (!originalImage) {
+                    alert('Silakan upload gambar terlebih dahulu!');
+                    return;
+                }
+                
+                const link = document.createElement('a');
+                link.download = 'whatsapp-sticker.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+        });
+    </script>
+<!-- Ikon ☰ pojok kanan atas -->
+<div class="hamburger" onclick="toggleMenu()">☰</div>
+
+<!-- Side menu -->
+<nav id="sideMenu" class="side-menu">
+  <!-- Bagian link menu -->
+  <div class="menu-links">
+    <a href="../">🏠 Menu Utama</a>
+    <a href="../remover/">🖼️ Remover Background</a>
+  </div>
+
+  <!-- Footer di bawah -->
+  <div class="menu-footer">
+    <p>Terimakasih telah support <b>Ardan</b></p>
+    <div class="social-links">
+      <a href="https://t.me/username" target="_blank">📨 Telegram</a>
+      <a href="https://wa.me/628xxxxxxx" target="_blank">💬 WhatsApp</a>
+    </div>
+    <p class="copyright">© Published by Ardan</p>
+  </div>
+</nav>
+
+<style>
+  .hamburger {
+    position: fixed;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    cursor: pointer;
+    z-index: 1001;
+    color: white;
+    background: rgba(255,255,255,0.1);
+    padding: 5px 12px;
+    border-radius: 6px;
+    user-select: none;
+  }
+
+  .side-menu {
+    position: fixed;
+    top: 0;
+    right: -260px; /* tersembunyi */
+    width: 260px;
+    height: 100%;
+    background: rgba(20,20,40,0.97);
+    box-shadow: -5px 0 15px rgba(0,0,0,0.6);
+    padding-top: 60px;
+    transition: right 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* link di atas, footer di bawah */
+    z-index: 1000;
+  }
+
+  .menu-links {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .side-menu a {
+    padding: 15px 20px;
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    transition: background 0.3s;
+    display: block;
+    border-bottom: 1px solid rgba(255,255,255,0.15); /* garis bawah */
+  }
+
+  .side-menu a:hover {
+    background: rgba(255,255,255,0.15);
+  }
+
+  .side-menu.active {
+    right: 0;
+  }
+
+  .menu-footer {
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    font-size: 0.9rem;
+    color: #ccc;
+  }
+
+  .menu-footer .social-links {
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0;
+    gap: 8px;
+  }
+
+  .menu-footer .social-links a {
+    color: #ff00aa;
+    font-weight: 600;
+  }
+
+  .menu-footer .social-links a:hover {
+    text-decoration: underline;
+  }
+
+  .menu-footer .copyright {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: #999;
+  }
+</style>
+
+<script>
+  function toggleMenu() {
+    document.getElementById("sideMenu").classList.toggle("active");
+  }
+</script>
+</body>
+</html>
